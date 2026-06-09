@@ -4,6 +4,8 @@ import br.edu.ifgoiano.grpc.*;
 
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementação do Serviço gRPC de Turmas
@@ -17,6 +19,8 @@ import net.devh.boot.grpc.server.service.GrpcService;
  */
 @GrpcService
 public class TurmaGrpcServiceImpl extends TurmaGrpcServiceGrpc.TurmaGrpcServiceImplBase {
+
+        private static final Logger logger = LoggerFactory.getLogger(TurmaGrpcServiceImpl.class);
 
         private final TurmaService turmaService;
 
@@ -38,11 +42,10 @@ public class TurmaGrpcServiceImpl extends TurmaGrpcServiceGrpc.TurmaGrpcServiceI
                         StreamObserver<ReservaVagaResponse> responseObserver) {
 
                 Long turmaId = request.getTurmaId();
-                System.out.println("[TURMA-SERVICE] gRPC ReservarVaga chamado para turma ID: " + turmaId);
-                
+                logger.info("[TURMA-SERVICE] gRPC ReservarVaga chamado para turma ID: {}", turmaId);
+
                 boolean sucesso = turmaService.reservarVaga(turmaId);
 
-                // Construir resposta gRPC
                 ReservaVagaResponse response = ReservaVagaResponse.newBuilder()
                                 .setSucesso(sucesso)
                                 .setMensagem(
@@ -51,11 +54,10 @@ public class TurmaGrpcServiceImpl extends TurmaGrpcServiceGrpc.TurmaGrpcServiceI
                                                                 : "Falha ao reservar vaga - sem vagas disponíveis ou turma não encontrada")
                                 .build();
 
-                // Enviar resposta para o cliente
                 responseObserver.onNext(response);
                 responseObserver.onCompleted();
-                
-                System.out.println("[TURMA-SERVICE] gRPC ReservarVaga resultado: " + sucesso);
+
+                logger.info("[TURMA-SERVICE] gRPC ReservarVaga resultado: {}", sucesso);
         }
 
         /**
@@ -71,11 +73,10 @@ public class TurmaGrpcServiceImpl extends TurmaGrpcServiceGrpc.TurmaGrpcServiceI
                         StreamObserver<LiberaVagaResponse> responseObserver) {
 
                 Long turmaId = request.getTurmaId();
-                System.out.println("[TURMA-SERVICE] gRPC LiberarVaga chamado para turma ID: " + turmaId);
-                
+                logger.info("[TURMA-SERVICE] gRPC LiberarVaga chamado para turma ID: {}", turmaId);
+
                 boolean sucesso = turmaService.liberarVaga(turmaId);
 
-                // Construir resposta gRPC
                 LiberaVagaResponse response = LiberaVagaResponse.newBuilder()
                                 .setSucesso(sucesso)
                                 .setMensagem(
@@ -84,10 +85,9 @@ public class TurmaGrpcServiceImpl extends TurmaGrpcServiceGrpc.TurmaGrpcServiceI
                                                                 : "Falha ao liberar vaga - turma não encontrada ou sem vagas a liberar")
                                 .build();
 
-                // Enviar resposta para o cliente
                 responseObserver.onNext(response);
                 responseObserver.onCompleted();
-                
-                System.out.println("[TURMA-SERVICE] gRPC LiberarVaga resultado: " + sucesso);
+
+                logger.info("[TURMA-SERVICE] gRPC LiberarVaga resultado: {}", sucesso);
         }
 }

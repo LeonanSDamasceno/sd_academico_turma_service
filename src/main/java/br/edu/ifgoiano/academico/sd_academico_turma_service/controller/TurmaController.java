@@ -1,5 +1,7 @@
 package br.edu.ifgoiano.academico.sd_academico_turma_service.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +22,8 @@ import java.util.List;
 @RequestMapping("/turmas")
 public class TurmaController {
 
+    private static final Logger logger = LoggerFactory.getLogger(TurmaController.class);
+
     private final TurmaService service;
 
     // Injeção de dependência do serviço de turmas
@@ -34,11 +38,9 @@ public class TurmaController {
      */
     @PostMapping
     public ResponseEntity<Turma> criar(@RequestBody Turma turma) {
-        System.out.println("[TURMA-SERVICE] Criando turma: " + turma.getCodigoTurma());
-        
+        logger.info("[TURMA-SERVICE] Criando turma: {}", turma.getCodigoTurma());
         Turma turmaSalva = service.salvar(turma);
-        
-        System.out.println("[TURMA-SERVICE] Turma criada com ID: " + turmaSalva.getId());
+        logger.info("[TURMA-SERVICE] Turma criada com ID: {}", turmaSalva.getId());
         return ResponseEntity.ok(turmaSalva);
     }
 
@@ -48,7 +50,7 @@ public class TurmaController {
      */
     @GetMapping
     public ResponseEntity<List<Turma>> listar() {
-        System.out.println("[TURMA-SERVICE] Listando todas as turmas");
+        logger.info("[TURMA-SERVICE] Listando todas as turmas");
         return ResponseEntity.ok(service.listar());
     }
 
@@ -59,8 +61,7 @@ public class TurmaController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<?> buscarPorId(@PathVariable Long id) {
-        System.out.println("[TURMA-SERVICE] Buscando turma ID: " + id);
-        
+        logger.info("[TURMA-SERVICE] Buscando turma ID: {}", id);
         return service.buscarPorId(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

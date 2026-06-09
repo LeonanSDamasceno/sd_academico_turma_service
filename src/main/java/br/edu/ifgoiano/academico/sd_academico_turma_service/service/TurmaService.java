@@ -1,5 +1,7 @@
 package br.edu.ifgoiano.academico.sd_academico_turma_service.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +21,8 @@ import java.util.Optional;
  */
 @Service
 public class TurmaService {
+
+    private static final Logger logger = LoggerFactory.getLogger(TurmaService.class);
 
     private final TurmaRepository repository;
 
@@ -73,37 +77,33 @@ public class TurmaService {
      */
     @Transactional
     public boolean reservarVaga(Long turmaId) {
-        
-        System.out.println("[TURMA-SERVICE] Reservando vaga para turma ID: " + turmaId);
-        
+        logger.info("[TURMA-SERVICE] Reservando vaga para turma ID: {}", turmaId);
+
         Optional<Turma> optionalTurma = repository.findById(turmaId);
 
-        // Validar existência da turma
         if (optionalTurma.isEmpty()) {
-            System.out.println("[TURMA-SERVICE] Turma ID " + turmaId + " não encontrada");
+            logger.warn("[TURMA-SERVICE] Turma ID {} não encontrada", turmaId);
             return false;
         }
 
         Turma turma = optionalTurma.get();
 
-        // Validar se há vagas disponíveis
         if (turma.getVagasOcupadas() >= turma.getVagasTotal()) {
-            System.out.println("[TURMA-SERVICE] Turma ID " + turmaId + " sem vagas disponíveis");
+            logger.warn("[TURMA-SERVICE] Turma ID {} sem vagas disponíveis ({}/{})",
+                    turmaId, turma.getVagasOcupadas(), turma.getVagasTotal());
             return false;
         }
 
-        // Incrementar vagas ocupadas
         turma.setVagasOcupadas(turma.getVagasOcupadas() + 1);
-        
-        // Atualizar status se lotada
+
         if (turma.getVagasOcupadas() >= turma.getVagasTotal()) {
             turma.setStatus("LOTADA");
         }
 
         repository.save(turma);
-        
-        System.out.println("[TURMA-SERVICE] Vaga reservada para turma ID: " + turmaId + 
-                           " | Vagas: " + turma.getVagasOcupadas() + "/" + turma.getVagasTotal());
+
+        logger.info("[TURMA-SERVICE] Vaga reservada para turma ID: {} | Vagas: {}/{}",
+                turmaId, turma.getVagasOcupadas(), turma.getVagasTotal());
 
         return true;
     }
@@ -116,35 +116,29 @@ public class TurmaService {
      */
     @Transactional
     public boolean liberarVaga(Long turmaId) {
-        
-        System.out.println("[TURMA-SERVICE] Liberando vaga para turma ID: " + turmaId);
-        
+        logger.info("[TURMA-SERVICE] Liberando vaga para turma ID: {}", turmaId);
+
         Optional<Turma> optionalTurma = repository.findById(turmaId);
 
-        // Validar existência da turma
         if (optionalTurma.isEmpty()) {
-            System.out.println("[TURMA-SERVICE] Turma ID " + turmaId + " não encontrada");
+            logger.warn("[TURMA-SERVICE] Turma ID {} não encontrada", turmaId);
             return false;
         }
 
         Turma turma = optionalTurma.get();
 
-        // Validar se há vagas para liberar
         if (turma.getVagasOcupadas() <= 0) {
-            System.out.println("[TURMA-SERVICE] Nenhuma vaga para liberar na turma ID: " + turmaId);
+            logger.warn("[TURMA-SERVICE] Nenhuma vaga para liberar na turma ID: {}", turmaId);
             return false;
         }
 
-        // Decrementar vagas ocupadas
         turma.setVagasOcupadas(turma.getVagasOcupadas() - 1);
-        
-        // Atualizar status para ATIVA se havia vagas
         turma.setStatus("ATIVA");
 
         repository.save(turma);
-        
-        System.out.println("[TURMA-SERVICE] Vaga liberada para turma ID: " + turmaId + 
-                           " | Vagas: " + turma.getVagasOcupadas() + "/" + turma.getVagasTotal());
+
+        logger.info("[TURMA-SERVICE] Vaga liberada para turma ID: {} | Vagas: {}/{}",
+                turmaId, turma.getVagasOcupadas(), turma.getVagasTotal());
 
         return true;
     }
