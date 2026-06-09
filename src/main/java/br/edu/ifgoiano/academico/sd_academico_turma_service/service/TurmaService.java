@@ -1,6 +1,7 @@
 package br.edu.ifgoiano.academico.sd_academico_turma_service.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.edu.ifgoiano.academico.sd_academico_turma_service.entity.Turma;
 import br.edu.ifgoiano.academico.sd_academico_turma_service.repository.TurmaRepository;
@@ -38,6 +39,7 @@ public class TurmaService {
         return repository.findById(id);
     }
 
+    @Transactional
     public boolean reservarVaga(Long turmaId) {
 
         Optional<Turma> optionalTurma = repository.findById(turmaId);
@@ -60,6 +62,7 @@ public class TurmaService {
         return true;
     }
 
+    @Transactional
     public boolean liberarVaga(Long turmaId) {
 
         Optional<Turma> optionalTurma = repository.findById(turmaId);
